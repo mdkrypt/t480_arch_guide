@@ -1,7 +1,5 @@
 # ThinkPad T480 Arch Linux Installation Guide 
 
-**Disclaimer:** While creating this guide, I did lean on AI for occasional troubleshooting, structuring the format, as well as proofing the final steps.  There was much back and forth, long nights, and many ridiculous arguments between myself and the machine. This guide was created through much trial and error on my part, as well as referencing the awesome documentation provided by the Arch and Hyprland Wikis.  However, it would be disrespectful to allow you to read any further without acknowledging that AI did play some part in its creation. As always, trust but verify.
-
 [<img src="https://img.shields.io/badge/Hardware-ThinkPad_T480-red?style=for-the-badge&logo=lenovo"/>](https://lenovo.com)
 [<img src="https://img.shields.io/badge/OS-Arch_Linux-1793d1?style=for-the-badge&logo=arch-linux"/>](https://archlinux.org)
 [<img src="https://img.shields.io/badge/Boot-GRUB_Btrfs-blue?style=for-the-badge&logo=gnu"/>](https://www.gnu.org/software/grub/)
@@ -740,6 +738,13 @@ snapper list
 cat /etc/snapper-rollback.conf
 
 ```
+---
+
+## Acknowledgments
+
+This guide was created through extensive trial and error on my physical hardware while referencing the Arch and Hyprland Wikis. 
+
+However, I also want to acknowledge the role of AI as a research partner—specifically for troubleshooting obscure errors, structuring the documentation, and the occasional ridiculous argument when the machine was wrong. As always: trust, but verify.
 
 ---
 
