@@ -770,4 +770,4 @@ SOFTWARE.
 
 ```
 
-*Last Updated: February 2026 | Kernel: 6.x + LTS Fallback | Config Status: Immutable*
+*Last Updated: February 2026 | Kernel: Linux LTS (6.x) | Config Status: Immutable*
