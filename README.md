@@ -267,7 +267,7 @@ FILES=(/crypto_keyfile.bin)
 MODULES=(btrfs i915 nouveau)
 
 # 3. Hooks (Order is Critical)
-HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt resume filesystems fsck)
+HOOKS=(base udev autodetect modconf kms keyboard keymap consolefont block encrypt resume filesystems fsck grub-btrfs-overlayfs)
 
 ```
 
@@ -306,7 +306,7 @@ GRUB_ENABLE_CRYPTODISK=y
 # 2. Kernel Parameters
 # Replace [UUID_P2] with the UUID of your LUKS partition (/dev/nvme0n1p2)
 # Replace [OFFSET] with the number you found in Step 1
-GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=[UUID_P2]:cryptroot cryptkey=rootfs:/crypto_keyfile.bin root=/dev/mapper/cryptroot rootflags=subvol=@ resume=/dev/mapper/cryptroot resume_offset=[OFFSET] i915.enable_psr=0 nowatchdog"
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=[UUID_P2]:cryptroot cryptkey=rootfs:/crypto_keyfile.bin root=/dev/mapper/cryptroot rootflags=subvol=@ resume=/dev/mapper/cryptroot resume_offset=[OFFSET] i915.enable_psr=1 nowatchdog"
 
 ```
 
@@ -531,9 +531,22 @@ pacman -S qemu-desktop libvirt virt-manager dnsmasq dmidecode
 # 2. Critical Performance Step: Nested Subvolume
 # Create a separate subvolume for VM images to prevent Snapper from 
 # snapshotting them (which causes severe fragmentation and performance loss).
-rm -rf /var/lib/libvirt/images  # Remove the default empty folder
+
+# SAFETY: Move existing folder instead of deleting it to prevent data loss
+if [ -d "/var/lib/libvirt/images" ]; then
+    mv /var/lib/libvirt/images /var/lib/libvirt/images_backup_$(date +%s)
+fi
+
 btrfs subvolume create /var/lib/libvirt/images
 chattr +C /var/lib/libvirt/images
+
+# PERSISTENCE: Add to fstab so it survives reboot/rollback
+# We use compress=none because NoCoW and Compression don't mix.
+# We fetch the specific subvol ID to ensure accurate mounting.
+_UUID=$(blkid -s UUID -o value /dev/mapper/cryptroot)
+_SUBVOLID=$(btrfs subvolume list / | grep "var/lib/libvirt/images" | awk '{print $2}')
+
+echo "UUID=${_UUID}  /var/lib/libvirt/images  btrfs  rw,noatime,compress=none,subvolid=${_SUBVOLID}  0 0" >> /etc/fstab
 
 # 3. Permissions & Groups
 # Add user to libvirt group
